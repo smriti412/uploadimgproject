@@ -7,6 +7,9 @@ import RefreshOutlinedIcon from "@mui/icons-material/RefreshOutlined";
 import FlipOutlinedIcon from "@mui/icons-material/FlipOutlined";
 import FindReplaceOutlinedIcon from "@mui/icons-material/FindReplaceOutlined";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 
 const MyModal = ({
   openModal,
@@ -20,9 +23,17 @@ const MyModal = ({
   const [rotation, setRotation] = useState(0);
   const [flipHorizontal, setFlipHorizontal] = useState(false);
   const [flipVertical, setFlipVertical] = useState(false);
+  const [isCropping, setIsCropping] = useState(false);
+  const [cropper, setCropper] = useState(null);
 
   const handleCrop = () => {
-    console.log("crop");
+    setIsCropping(true);
+    setExpandOptions(false);
+    // if (cropper) {
+    //   const croppedImage = cropper?.getCroppedCanvas();
+    //   const croppedImageUrl = croppedImage.toDataURL();
+    //   setImgLink(croppedImageUrl);
+    // }
   };
   const handleRotate = () => {
     setRotation((prevRotation) => (prevRotation + 90) % 360);
@@ -118,7 +129,6 @@ const MyModal = ({
       canvas.toBlob((blob) => {
         if (blob) {
           const blobUrl = URL.createObjectURL(blob);
-          console.log(blobUrl);
 
           const imageObject = {
             name: `Asset ${(imagesData.length + 1)
@@ -216,26 +226,61 @@ const MyModal = ({
                     />
                   </Tooltip>
                 </>
-              ) : (
+              ) : !isCropping ? (
                 <Tooltip title="Edit" placement="left">
                   <ModeEditOutlinedIcon
                     className="text-white"
                     onClick={() => setExpandOptions(true)}
                   />
                 </Tooltip>
-              )}
+              ) : null}
             </div>
-            <img
-              src={imgLink}
-              alt="img"
-              style={{
-                transform: `rotate(${rotation}deg) ${
-                  flipHorizontal ? "scaleX(-1)" : ""
-                } ${flipVertical ? "scaleY(-1)" : ""}`,
-                transition: "transform 0.3s ease-in-out",
-              }}
-              className="rounded-md w-full h-full !object-contain"
-            />
+            {isCropping ? (
+              <div>
+                <div className="absolute right-4 top-4 p-1 bg-black bg-opacity-60 z-10 rounded-md flex flex-col space-y-2 cursor-pointer ">
+                  <Tooltip title="Close" placement="left">
+                    <CloseOutlinedIcon
+                      className="text-white"
+                      onClick={() => {
+                        setIsCropping(false);
+                        setExpandOptions(true);
+                      }}
+                    />
+                  </Tooltip>
+
+                  <Tooltip title="Crop" placement="left">
+                    <DoneOutlinedIcon
+                      className="text-white"
+                      onClick={() => {
+                        setIsCropping(false);
+                        setExpandOptions(true);
+                      }}
+                    />
+                  </Tooltip>
+                </div>
+
+                <Cropper
+                  src={imgLink}
+                  style={{ height: "100%", width: "100%" }}
+                  initialAspectRatio={1}
+                  guides={false}
+                  ref={(cropperInstance) => setCropper(cropperInstance)}
+                  className="rounded-md w-full h-full !object-contain"
+                />
+              </div>
+            ) : (
+              <img
+                src={imgLink}
+                alt="img"
+                style={{
+                  transform: `rotate(${rotation}deg) ${
+                    flipHorizontal ? "scaleX(-1)" : ""
+                  } ${flipVertical ? "scaleY(-1)" : ""}`,
+                  transition: "transform 0.3s ease-in-out",
+                }}
+                className="rounded-md w-full h-full !object-contain"
+              />
+            )}
           </div>
           <div className="w-[30%] mx-3">
             <div className="border-2 border-gray-300 py-1 px-3 rounded-md font-semibold w-100">

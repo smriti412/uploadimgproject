@@ -1,6 +1,6 @@
 //Techstack used-> react.js, MUI, TailwindCSS
 //When flipping and rotating together, sometimes image is shifting out of canvas (due to which final image rendered is white.)
-
+//Crop functionality not implemented completely
 import React, { useState } from "react";
 import boxImg from "../assets/images/box.png";
 import { Button } from "@mui/material";
@@ -24,8 +24,6 @@ const AddAssetPage = () => {
   const handleButtonClick = () => {
     document.getElementById("imageUpload").click();
   };
-
-  console.log(imagesData.length);
 
   return (
     <>
